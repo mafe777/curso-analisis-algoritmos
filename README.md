@@ -15,3 +15,7 @@ A continuación se muestra un ejemplo rápido de configuración del entorno de t
 git status
 git add .
 git commit -m "Mensaje descriptivo"
+
+# Maria Fernanda Muñoz Jaramillo
+# Semestre 2026-2
+# correo: mariamunoz316009@correo.itm.edu.co
