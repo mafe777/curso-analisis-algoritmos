@@ -1,6 +1,6 @@
 # Curso: Análisis y Diseño de Algoritmos
 
-Repositorio oficial para el almacenamiento y entrega de laboratorios, ejercicios prácticos y scripts de medición durante el semestre académico.
+Repositorio oficial para el almacenamiento y entrega de laboratorios, ejercicios prácticos y scripts  durante el semestre 2026-2.
 
 ## Estructura del Repositorio
 * **laboratorios/**: Contiene la carpeta para cada uno de los cinco informes evaluativos del curso.
