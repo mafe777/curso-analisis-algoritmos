@@ -10,7 +10,7 @@ def insertion_sort(datos: list[int]) -> tuple[list[int], int]:
         datos: lista de indices de riesgo a ordenar
 
     Returns:
-        Una tupla con la lista ordenada y el numero total de
+        una tupla con la lista ordenada y el numero total de
         comparaciones entre elementos realizadas durante el proceso
     """
     lista = list(datos)
@@ -33,7 +33,7 @@ def insertion_sort(datos: list[int]) -> tuple[list[int], int]:
     return lista, comparaciones
 
 def merge_sort(datos: list[int]) -> tuple[list[int], int]:
-    """Ordena una lista de indices de riesgo con el metodo de mezcla
+    """ordena una lista de indices de riesgo con el metodo de mezcla
 
     No modifica la lista recibida: trabaja sobre una copia
 
@@ -41,7 +41,7 @@ def merge_sort(datos: list[int]) -> tuple[list[int], int]:
         datos: lista de indices de riesgo a ordenar
 
     Returns:
-        Una tupla con la lista ordenada y el numero total de
+        una tupla con la lista ordenada y el numero total de
         comparaciones entre elementos realizadas durante el proceso
     """
     lista = list(datos)
@@ -63,7 +63,7 @@ def merge_sort(datos: list[int]) -> tuple[list[int], int]:
         i = j = 0
         comparaciones = 0
 
-        # Ordenamos de mayor a menor riesgo para Tamiza
+        # ordenamos de mayor a menor riesgo para Tamiza
         while i < len(izq) and j < len(der):
             comparaciones += 1
             if izq[i] >= der[j]:
