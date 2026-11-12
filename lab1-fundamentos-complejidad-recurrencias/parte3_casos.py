@@ -7,7 +7,7 @@ from algoritmos import insertion_sort
 
 
 def ejecutar_experimento() -> None:
-    """Ejecuta insertion sort en los tres escenarios, mide tiempos y comparaciones,
+    """ejecuta insertion sort en los tres escenarios, mide tiempos y comparaciones,
 
     y genera las gráficas correspondientes en la carpeta graficas/.
     """
@@ -46,7 +46,7 @@ def ejecutar_experimento() -> None:
         tiempos_c.append(fin - inicio)
         comps_c.append(c_c)
 
-    # Gráfica 1: Comparaciones vs. Tamaño de entrada
+    # Grafica 1: Comparaciones vs. Tamaño de entrada
     plt.figure(figsize=(8, 5))
     plt.plot(tamanios, comps_a, marker='o', label='Escenario A (Aleatorio)')
     plt.plot(tamanios, comps_b, marker='s', label='Escenario B (Casi ordenado)')

@@ -25,13 +25,13 @@ def ejecutar_comparacion() -> None:
         fin = time.perf_counter()
         tiempos_insertion.append(fin - inicio)
 
-        # Medición Merge Sort
+        # medición Merge Sort
         inicio = time.perf_counter()
         merge_sort(datos)
         fin = time.perf_counter()
         tiempos_merge.append(fin - inicio)
 
-    # Gráfica Parte 4: Tiempo vs. Tamaño de entrada (Ambos algoritmos)
+    # Grafica Parte 4: Tiempo vs. Tamaño de entrada (Ambos algoritmos)
     plt.figure(figsize=(8, 5))
     plt.plot(tamanios, tiempos_insertion, marker='o', label='Insertion Sort')
     plt.plot(tamanios, tiempos_merge, marker='s', label='Merge Sort')
