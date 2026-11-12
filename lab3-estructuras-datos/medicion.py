@@ -1,8 +1,7 @@
-"""Script de experimentación y medición de tiempos para Lista Enlazada vs Tabla Hash."""
+"""Script para medir tiempos de busqueda y generar graficas de rendimiento."""
 
-import os
-import random
 import time
+import random
 import matplotlib.pyplot as plt
 from estructuras import ListaEnlazada, TablaHash
 
@@ -10,7 +9,16 @@ from estructuras import ListaEnlazada, TablaHash
 def generar_guias_inexistentes(
     existentes: set[int], cantidad: int, semilla: int = 7
 ) -> list[int]:
-    """Genera guías de diez dígitos que no están en la colección."""
+    """Genera guias de diez digitos que no estan en la coleccion.
+
+    Args:
+        existentes: guias almacenadas en las estructuras.
+        cantidad: cuantas guias inexistentes generar.
+        semilla: semilla del generador, para reproducir la medicion.
+
+    Returns:
+        Una lista con `cantidad` guias que no pertenecen al conjunto.
+    """
     azar = random.Random(semilla)
     inexistentes: list[int] = []
     while len(inexistentes) < cantidad:
@@ -20,113 +28,123 @@ def generar_guias_inexistentes(
     return inexistentes
 
 
+def es_primo(num: int) -> bool:
+    """Verifica si un numero entero es primo."""
+    if num < 2:
+        return False
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return False
+    return True
+
+
+def obtener_primo_cercano(n: int) -> int:
+    """Encuentra un numero primo cercano a n / 2."""
+    candidato = max(3, n // 2)
+    while not es_primo(candidato):
+        candidato += 1
+    return candidato
+
+
 def ejecutar_experimentos() -> None:
-    """Ejecuta los experimentos A y B, y genera las gráficas correspondientes."""
-    
-    # Asegurar que la carpeta de gráficas exista
-    os.makedirs("lab3-estructuras-datos/graficas", exist_ok=True)
-    
-    # -------------------------------------------------------------
-    # Experimento A: Lista vs Tabla Hash frente a n
-    # -------------------------------------------------------------
-    tamanios = [100, 500, 1000, 5000, 20000, 50000]
+    """Ejecuta el Experimento A y Experimento B generando las graficas."""
+    print("--- Iniciando Experimento A: Lista vs Tabla Hash ---")
+    tamanios = [100, 500, 1000, 5000, 10000, 20000]
     tiempos_lista = []
     tiempos_tabla = []
 
-    print("Iniciando Experimento A (Lista vs Tabla Hash)...")
     for n in tamanios:
+        # Construccion de datos con semilla fija
         azar = random.Random(42)
-        claves = set()
-        while len(claves) < n:
-            claves.add(azar.randint(10**9, 10**10 - 1))
-        
+        existentes_set = set()
         lista = ListaEnlazada()
-        m = max(3, int(n / 2))
+        m = obtener_primo_cercano(n)
         tabla = TablaHash(m)
 
-        for guia in claves:
-            lista.insertar(guia, "en bodega")
-            tabla.insertar(guia, "en bodega")
+        for _ in range(n):
+            g = azar.randint(10**9, 10**10 - 1)
+            existentes_set.add(g)
+            lista.insertar(g, "en bodega")
+            tabla.insertar(g, "en bodega")
 
-        inexistentes = generar_guias_inexistentes(claves, 200, semilla=7)
+        # Validacion previa obligatoria con assert para muestras existentes
+        muestra_existente = list(existentes_set)[:5]
+        for g in muestra_existente:
+            assert lista.buscar(g) == tabla.buscar(g)
 
-        # Medir búsqueda en lista enlazada
-        inicio_l = time.perf_counter()
+        # Generar guias inexistentes para medir el peor caso
+        inexistentes = generar_guias_inexistentes(existentes_set, 200, semilla=7)
+
+        # Medicion Lista Enlazada
+        inicio = time.perf_counter()
         for g in inexistentes:
             lista.buscar(g)
-        fin_l = time.perf_counter()
-        tiempo_medio_lista = (fin_l - inicio_l) / 200
+        fin = time.perf_counter()
+        tiempos_lista.append((fin - inicio) / len(inexistentes))
 
-        # Medir búsqueda en tabla hash
-        inicio_t = time.perf_counter()
+        # Medicion Tabla Hash
+        inicio = time.perf_counter()
         for g in inexistentes:
             tabla.buscar(g)
-        fin_t = time.perf_counter()
-        tiempo_medio_tabla = (fin_t - inicio_t) / 200
+        fin = time.perf_counter()
+        tiempos_tabla.append((fin - inicio) / len(inexistentes))
 
-        tiempos_lista.append(tiempo_medio_lista)
-        tiempos_tabla.append(tiempo_medio_tabla)
-        print(f"n = {n:5d} | m = {m:5d} | Lista: {tiempo_medio_lista:.8f} s | Tabla: {tiempo_medio_tabla:.8f} s")
-
-    # Gráfica Experimento A
-    plt.figure(figsize=(10, 6))
-    plt.plot(tamanios, tiempos_lista, marker='o', linestyle='-', color='crimson', label='Lista Enlazada $\\Theta(n)$')
-    plt.plot(tamanios, tiempos_tabla, marker='s', linestyle='-', color='dodgerblue', label='Tabla Hash $\\Theta(1 + \\alpha)$')
-    plt.title("Rendimiento: Lista Enlazada vs Tabla Hash (Búsquedas Inexistentes)")
-    plt.xlabel("Número de guías ($n$)")
-    plt.ylabel("Tiempo medio por búsqueda (segundos)")
+    # Grafica Experimento A
+    plt.figure(figsize=(8, 5))
+    plt.plot(tamanios, tiempos_lista, label="Lista Enlazada O(n)", marker="o")
+    plt.plot(tamanios, tiempos_tabla, label="Tabla Hash O(1 + alpha)", marker="s")
+    plt.title("Experimento A: Tiempo Medio de Busqueda vs Numero de Guias (n)")
+    plt.xlabel("Numero de guias (n)")
+    plt.ylabel("Tiempo medio por busqueda (segundos)")
     plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.savefig("lab3-estructuras-datos/graficas/lista_vs_tabla.png", dpi=300, bbox_inches='tight')
+    plt.grid(True)
+    plt.savefig("graficas/lista_vs_tabla.png")
     plt.close()
 
-    # -------------------------------------------------------------
-    # Experimento B: Efecto del factor de carga (alfa) con n fijo
-    # -------------------------------------------------------------
+    print("--- Iniciando Experimento B: Efecto del Factor de Carga (alpha) ---")
     n_fijo = 20000
-    alfas_objetivo = [0.25, 1.0, 4.0, 10.0]
-    valores_alfa = []
+    # Factores de carga objetivo entre 0.25 y 10
+    alphas_objetivo = [0.25, 0.5, 1.0, 2.0, 5.0, 10.0]
     tiempos_alfa = []
+    valores_alfa_reales = []
 
-    print("\nIniciando Experimento B (Efecto del factor de carga)...")
-    azar = random.Random(42)
-    claves_fijas = set()
-    while len(claves_fijas) < n_fijo:
-        claves_fijas.add(azar.randint(10**9, 10**10 - 1))
+    azar_b = random.Random(42)
+    existentes_b = set()
+    guias_b = []
+    for _ in range(n_fijo):
+        g = azar_b.randint(10**9, 10**10 - 1)
+        existentes_b.add(g)
+        guias_b.append(g)
 
-    inexistentes_b = generar_guias_inexistentes(claves_fijas, 200, semilla=7)
+    inexistentes_b = generar_guias_inexistentes(existentes_b, 200, semilla=99)
 
-    for alfa_obj in alfas_objetivo:
-        m_val = max(1, int(n_fijo / alfa_obj))
-        tabla_b = TablaHash(m_val)
-        for guia in claves_fijas:
-            tabla_b.insertar(guia, "en reparto")
+    for alpha_obj in alphas_objetivo:
+        m_calc = max(1, int(n_fijo / alpha_obj))
+        tabla_b = TablaHash(m_calc)
+        for g in guias_b:
+            tabla_b.insertar(g, "en reparto")
 
         alpha_real = tabla_b.factor_carga()
+        valores_alfa_reales.append(alpha_real)
 
-        inicio_b = time.perf_counter()
+        inicio = time.perf_counter()
         for g in inexistentes_b:
             tabla_b.buscar(g)
-        fin_b = time.perf_counter()
-        tiempo_medio_b = (fin_b - inicio_b) / 200
+        fin = time.perf_counter()
+        tiempos_alfa.append((fin - inicio) / len(inexistentes_b))
 
-        valores_alfa.append(alpha_real)
-        tiempos_alfa.append(tiempo_medio_b)
-        print(f"Alfa objetivo: {alfa_obj:4.2f} | Alfa real: {alpha_real:5.2f} | m: {m_val:6d} | Tiempo: {tiempo_medio_b:.8f} s")
-
-    # Gráfica Experimento B
-    plt.figure(figsize=(10, 6))
-    plt.plot(valores_alfa, tiempos_alfa, marker='^', linestyle='-', color='forestgreen', label='Tabla Hash')
-    plt.title("Efecto del Factor de Carga ($\\alpha$) en el Tiempo de Búsqueda")
-    plt.xlabel("Factor de carga ($\\alpha = n / m$)")
-    plt.ylabel("Tiempo medio por búsqueda (segundos)")
+    # Grafica Experimento B
+    plt.figure(figsize=(8, 5))
+    plt.plot(valores_alfa_reales, tiempos_alfa, label="Tabla Hash (Busqueda Infructuosa)", marker="^", color="purple")
+    plt.title("Experimento B: Tiempo Medio de Busqueda vs Factor de Carga (alpha)")
+    plt.xlabel("Factor de carga (alpha = n / m)")
+    plt.ylabel("Tiempo medio por busqueda (segundos)")
     plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.savefig("lab3-estructuras-datos/graficas/tiempo_vs_alfa.png", dpi=300, bbox_inches='tight')
+    plt.grid(True)
+    plt.savefig("graficas/tiempo_vs_alfa.png")
     plt.close()
-
-    print("\n¡Experimentos completados y gráficas generadas con éxito!")
+    print("¡Experimentos concluidos y graficas generadas en graficas/!")
 
 
 if __name__ == "__main__":
-    ejecutar_experimentos()
+    experimento = ejecutar_experimentos()
