@@ -2,7 +2,7 @@
 
 
 def insertion_sort(datos: list[int]) -> tuple[list[int], int]:
-    """Ordena una lista de indices de riesgo con el metodo de insercion
+    """ordena una lista de indices de riesgo con el metodo de insercion
 
     No modifica la lista recibida: trabaja sobre una copia
 
