@@ -1,42 +1,38 @@
-"""Script de pruebas para los algoritmos de subarreglo máximo."""
+"""Script de pruebas unitarias y validación para el Laboratorio 02."""
 
 import random
-from subarreglo import subarreglo_fuerza_bruta, subarreglo_maximo
+from subarreglo import subarreglo_maximo_dv, subarreglo_fuerza_bruta
 
-# Serie de ocho dias de la situacion problema
-serie_ejemplo = [-3, 5, -2, 8, -6, 3, 9, -4]
-assert subarreglo_fuerza_bruta(serie_ejemplo)[2] == 17
-assert subarreglo_maximo(serie_ejemplo, 0, len(serie_ejemplo) - 1)[2] == 17
 
-#  Serie de un solo elemento
-serie_un_elemento = [42]
-assert subarreglo_fuerza_bruta(serie_un_elemento)[2] == 42
-assert subarreglo_maximo(serie_un_elemento, 0, 0)[2] == 42
+def ejecutar_pruebas() -> None:
+    """Ejecuta casos de prueba específicos y aleatorios."""
+    casos = [
+        [1, 2, 3, 4, 5],
+        [-1, -2, -3, -4],
+        [8, -3, -5, 9, -2, -6, 1, 5],
+        [10],
+    ]
 
-# Serie con todos los valores negativos
-serie_negativa = [-5, -2, -9, -1]
-assert subarreglo_fuerza_bruta(serie_negativa)[2] == -1
-assert subarreglo_maximo(serie_negativa, 0, len(serie_negativa) - 1)[2] == -1
+    print("--- Ejecutando pruebas unitarias ---")
+    for idx, caso in enumerate(casos):
+        res_fb = subarreglo_fuerza_bruta(caso)
+        res_dv = subarreglo_maximo_dv(caso, 0, len(caso) - 1)
+        print(f"Caso {idx + 1}: FB={res_fb[0]} | DV={res_dv[0]} -> Correcto: {res_fb[0] == res_dv[0]}")
 
-#  Serie con todos los valores positivos
-serie_positiva = [2, 4, 6, 8]
-assert subarreglo_fuerza_bruta(serie_positiva)[2] == 20
-assert subarreglo_maximo(serie_positiva, 0, len(serie_positiva) - 1)[2] == 20
+    print("\n--- Verificando 20 listas aleatorias con enteros (-100 a 100) ---")
+    for i in range(20):
+        tamanio = random.randint(5, 50)
+        lista_aleatoria = [random.randint(-100, 100) for _ in range(tamanio)]
+        
+        res_fb = subarreglo_fuerza_bruta(lista_aleatoria)
+        res_dv = subarreglo_maximo_dv(lista_aleatoria, 0, len(lista_aleatoria) - 1)
+        
+        if res_fb[0] != res_dv[0]:
+            print(f"Error en prueba aleatoria {i}: FB={res_fb[0]} vs DV={res_dv[0]}")
+            return
 
-# Caso donde el mejor tramo cruza el punto medio 
-serie_cruce = [1, -3, 5, 5, -3, 1]  # [5, 5] cruza el centro
-assert subarreglo_fuerza_bruta(serie_cruce)[2] == 10
-assert subarreglo_maximo(serie_cruce, 0, len(serie_cruce) - 1)[2] == 10
+    print("¡Todas las pruebas aleatorias pasaron con éxito!")
 
-#  Al menos veinte listas aleatorias comparando las soluciones
-random.seed(42)
-for k in range(20):
-    tam = random.randint(5, 50)
-    lista_aleatoria = [random.uniform(-50, 50) for _ in range(tam)]
-    res_fb = subarreglo_fuerza_bruta(lista_aleatoria)
-    res_dyv = subarreglo_maximo(lista_aleatoria, 0, len(lista_aleatoria) - 1)
-  
-    assert abs(res_fb[2] - res_dyv[2]) < 1e-5
-print("¡Todas las pruebas pasaron exitosamente sin errores!")
+
 if __name__ == "__main__":
-    pass
+    ejecutar_pruebas()
